@@ -1660,6 +1660,7 @@ body.dark .ocr-btn-apply { background: var(--green); }
               <th class="sortable" onclick="setSort('nombre')">Insumo <span class="sort-icon" id="si-nombre"></span></th>
               <th class="right">Inicial</th>
               <th class="right">Entradas</th>
+              <th class="right">Salidas</th>
               <th class="sortable right" onclick="setSort('stock')">Stock actual <span class="sort-icon" id="si-stock"></span></th>
               <th class="sortable right" onclick="setSort('consumo')">Cons./día <span class="sort-icon" id="si-consumo"></span></th>
               <th class="sortable" onclick="setSort('dias')">Cobertura <span class="sort-icon" id="si-dias"></span></th>
@@ -2364,6 +2365,7 @@ function renderTabla() {
       <td style="font-weight:500;">${ins.nombre}</td>
       <td class="num">${fmtNum(ins.stockInicial)}</td>
       <td class="num" style="color:var(--ok);">${fmtNum(ins.entradas)}</td>
+      <td class="num" style="color:var(--crit);">${fmtNum(ins.salidas)}</td>
       <td class="num" style="font-weight:700;">${fmtNum(sa)}</td>
       <td class="num td-editable" onclick="editarConsumo('${ins.sku}', this)" title="Clic para editar"><span>${ins.consumo}/día</span></td>
       <td>
@@ -2912,9 +2914,9 @@ function descargarXLSX(nombre, cols, filas) {
 }
 
 function exportarCSV() {
-  const cols = ['SKU','Insumo','Stock inicial','Entradas','Ajustes','Stock actual','Consumo/día','Días stock','Punto repos.','Estado'];
+  const cols = ['SKU','Insumo','Stock inicial','Entradas','Salidas','Ajustes','Stock actual','Consumo/día','Días stock','Punto repos.','Estado'];
   const filas = state.insumos.map(ins => [
-    ins.sku, ins.nombre, ins.stockInicial, ins.entradas, ins.ajustes||0,
+    ins.sku, ins.nombre, ins.stockInicial, ins.entradas, ins.salidas||0, ins.ajustes||0,
     stockActual(ins), ins.consumo,
     isFinite(diasStock(ins)) ? parseFloat(diasStock(ins).toFixed(1)) : 9999,
     ins.puntoRepos, calcularEstado(ins).toUpperCase()
