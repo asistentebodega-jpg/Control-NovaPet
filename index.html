@@ -1614,6 +1614,7 @@ body.dark .ocr-btn-apply { background: var(--green); }
     <button class="btn-hdr" onclick="exportarCSV()">↓ Excel</button>
     <button class="btn-hdr" onclick="exportarHistorialCSV()">↓ Historial</button>
     <button class="btn-hdr icon-only" id="btn-darkmode" onclick="toggleDark()" title="Modo oscuro">🌙</button>
+    <button class="btn-hdr" onclick="confirmarModal('¿Restablecer consumos?','Se restablecerán todos los consumos/día a los valores originales. El stock no se modifica.', resetConsumos, '↺', true)" title="Restablecer consumos diarios">↺ Consumos</button>
     <button class="btn-hdr danger" onclick="confirmarModal('¿Reiniciar sistema?','Se borrará todo el inventario, historial, cuadres y revisiones. Esta acción no se puede deshacer.', limpiarTodo, '🗑️', false)">Reset</button>
   </div>
 </header>
@@ -3152,6 +3153,21 @@ function switchMovTab(tipo) {
     panelSal.style.display = 'block';
     card.classList.add('salida-mode');
   }
+}
+
+// ════════════════════════════════════════════════
+// RESET CONSUMOS
+// ════════════════════════════════════════════════
+function resetConsumos() {
+  INSUMOS_DEFAULT.forEach(def => {
+    const ins = state.insumos.find(i => i.sku === def.sku);
+    if (ins) ins.consumo = def.consumo;
+  });
+  guardarEstado();
+  renderKPIs();
+  renderTabla();
+  renderAlertas();
+  toast('Consumos restablecidos a valores originales', 'success');
 }
 
 // ════════════════════════════════════════════════
