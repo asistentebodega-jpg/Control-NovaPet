@@ -286,33 +286,46 @@ main {
 /* ════════════════════════════════════════════
    ALERT BANNERS
 ════════════════════════════════════════════ */
-.alertas-container { margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px; }
+.alertas-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 360px;
+  max-width: calc(100vw - 48px);
+  pointer-events: none;
+}
 
 .alert-banner {
-  background: var(--crit-bg);
+  background: var(--surface);
   border: 1px solid var(--crit-border);
   border-left: 3px solid var(--crit);
-  border-radius: var(--radius-sm);
-  padding: 10px 16px;
+  border-radius: var(--radius);
+  padding: 12px 14px;
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  animation: slideInDown .2s ease;
-  transition: opacity .4s ease, transform .4s ease, max-height .4s ease, margin .4s ease, padding .4s ease;
+  box-shadow: var(--shadow-lg);
+  animation: slideInRight .25s cubic-bezier(.34,1.56,.64,1);
+  transition: opacity .35s ease, transform .35s ease, max-height .35s ease, margin .35s ease, padding .35s ease;
   overflow: hidden;
-  max-height: 100px;
+  max-height: 120px;
+  pointer-events: all;
 }
 .alert-banner.alert-hiding {
   opacity: 0;
-  transform: translateY(-6px);
+  transform: translateX(20px);
   max-height: 0;
   margin: 0;
   padding-top: 0;
   padding-bottom: 0;
 }
-@keyframes slideInDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 .alert-icon { font-size: 13px; margin-top: 1px; flex-shrink: 0; }
 .alert-text { font-size: 13px; color: var(--crit); font-weight: 500; line-height: 1.5; flex: 1; }
@@ -935,6 +948,20 @@ td.num {
   text-transform: uppercase;
   color: var(--text3);
 }
+.analysis-date-input {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  transition: border-color var(--transition);
+  cursor: pointer;
+}
+.analysis-date-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,184,90,.1); }
+.analysis-date-input::-webkit-calendar-picker-indicator { cursor: pointer; opacity: .6; }
 .analysis-select {
   min-width: 240px;
   font-family: 'DM Sans', sans-serif;
@@ -964,39 +991,77 @@ td.num {
 .analysis-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
 
 .chart-card {
-  background: var(--surface2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
 }
-.chart-card h4 {
+.chart-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.chart-card-header h4 {
   font-family: 'Exo 2', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--text3);
-  margin-bottom: 14px;
+  margin: 0;
 }
-.chart-bars { display: flex; flex-direction: column; gap: 11px; padding: 2px 0; }
+.chart-card-total {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.chart-card-total span {
+  font-size: 10px;
+  font-family: 'Exo 2', sans-serif;
+  color: var(--text3);
+  font-weight: 600;
+  letter-spacing: .08em;
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+.chart-bars { display: flex; flex-direction: column; gap: 14px; padding: 2px 0; }
 
 @keyframes barGrow { from { width: 0 !important; } }
-@keyframes fadeSlideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
-.chart-row { display: flex; align-items: center; gap: 10px; animation: fadeSlideIn .3s ease both; }
+@keyframes fadeSlideIn { from { opacity:0; transform:translateX(-6px); } to { opacity:1; transform:translateX(0); } }
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 52px;
+  align-items: center;
+  gap: 12px;
+  animation: fadeSlideIn .3s ease both;
+}
 .chart-label {
   font-size: 12px;
   color: var(--text2);
-  width: 148px;
-  flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
+  line-height: 1.3;
 }
-.chart-bar-wrap { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.chart-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text3);
+  display: block;
+  margin-top: 1px;
+}
+.chart-bar-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .chart-bar-track {
-  flex: 1;
-  height: 14px;
+  width: 100%;
+  height: 8px;
   background: var(--surface3);
   border-radius: 99px;
   overflow: hidden;
@@ -1005,23 +1070,21 @@ td.num {
 .chart-bar-fill {
   height: 100%;
   border-radius: 99px;
-  animation: barGrow .55s cubic-bezier(.4,0,.2,1) both;
+  animation: barGrow .6s cubic-bezier(.4,0,.2,1) both;
   position: relative;
 }
-.chart-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 50%;
-  background: rgba(255,255,255,.2);
-  border-radius: 99px 99px 0 0;
+.chart-bar-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text3);
+  text-align: right;
 }
 .chart-val {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  font-weight: 600;
-  min-width: 36px;
+  font-size: 14px;
+  font-weight: 700;
   text-align: right;
+  letter-spacing: -.02em;
 }
 
 /* ════════════════════════════════════════════
@@ -1577,6 +1640,26 @@ body.dark .ocr-btn-apply { background: var(--green); }
   </div>
 </div>
 
+<!-- CUADRE HISTÓRICO MODAL -->
+<div class="modal-overlay" id="hist-snap-overlay">
+  <div class="modal" style="max-width:540px;">
+    <div class="modal-icon">📅</div>
+    <div class="modal-title">Crear cuadre histórico</div>
+    <div class="modal-body" style="margin-bottom:14px;">
+      Ingresa la fecha del inventario anterior y el stock de cada insumo en esa fecha.
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-family:'Exo 2',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:6px;">Fecha del inventario</label>
+      <input type="date" id="hist-snap-fecha" class="analysis-date-input" style="width:100%;" value="2026-04-07">
+    </div>
+    <div style="max-height:280px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column;gap:8px;" id="hist-snap-items"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="modal-btn confirm green" onclick="guardarCuadreHistorico()" style="flex:1;">✓ Guardar cuadre</button>
+      <button class="modal-btn cancel" onclick="document.getElementById('hist-snap-overlay').classList.remove('open')" style="flex:1;">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- SHEETS CONFIG MODAL -->
 <div class="modal-overlay" id="sheets-modal-overlay">
   <div class="modal" style="max-width:520px;">
@@ -1614,7 +1697,6 @@ body.dark .ocr-btn-apply { background: var(--green); }
     <button class="btn-hdr" onclick="exportarCSV()">↓ Excel</button>
     <button class="btn-hdr" onclick="exportarHistorialCSV()">↓ Historial</button>
     <button class="btn-hdr icon-only" id="btn-darkmode" onclick="toggleDark()" title="Modo oscuro">🌙</button>
-    <button class="btn-hdr" onclick="confirmarModal('¿Restablecer consumos?','Se restablecerán todos los consumos/día a los valores originales. El stock no se modifica.', resetConsumos, '↺', true)" title="Restablecer consumos diarios">↺ Consumos</button>
     <button class="btn-hdr danger" onclick="confirmarModal('¿Reiniciar sistema?','Se borrará todo el inventario, historial, cuadres y revisiones. Esta acción no se puede deshacer.', limpiarTodo, '🗑️', false)">Reset</button>
   </div>
 </header>
@@ -1632,9 +1714,6 @@ body.dark .ocr-btn-apply { background: var(--green); }
 <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarArchivo(event)">
 
 <main>
-
-  <!-- ALERTAS -->
-  <div id="alertas-container" class="alertas-container"></div>
 
   <!-- KPIs -->
   <div class="kpi-grid" id="kpi-grid"></div>
@@ -1822,10 +1901,22 @@ body.dark .ocr-btn-apply { background: var(--green); }
   <div class="section-block" id="sec-analisis">
     <div class="section-header"><span class="section-title">Análisis entre cuadres</span></div>
     <div class="analysis-card">
-      <div class="analysis-meta" id="analysis-meta">Completa el conteo actual para comparar contra el último cuadre guardado.</div>
-      <div class="analysis-controls">
-        <span class="analysis-label">Cuadre base</span>
-        <select class="analysis-select" id="analysis-base-select" onchange="cambiarSnapshotBase(this.value)"></select>
+      <div class="analysis-meta" id="analysis-meta">Selecciona un período o deja vacío para calcular automáticamente.</div>
+      <div class="analysis-controls" style="flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="analysis-label">Desde</span>
+          <input type="date" class="analysis-date-input" id="analysis-fecha-desde" onchange="renderAnaliticaRevision()" title="Fecha inicio del período">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="analysis-label">Hasta</span>
+          <input type="date" class="analysis-date-input" id="analysis-fecha-hasta" onchange="renderAnaliticaRevision()" title="Fecha fin del período">
+        </div>
+        <button class="filter-btn" onclick="limpiarFechasAnalisis()" title="Usar período automático">↺ Auto</button>
+        <button class="filter-btn" onclick="abrirCrearCuadreHistorico()" title="Crear cuadre con fecha y stock manual">+ Cuadre histórico</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+          <span class="analysis-label">Cuadre base</span>
+          <select class="analysis-select" id="analysis-base-select" onchange="cambiarSnapshotBase(this.value)" style="min-width:180px;"></select>
+        </div>
       </div>
       <div class="analysis-grid" id="analysis-kpis"></div>
       <div class="analysis-table">
@@ -1841,9 +1932,22 @@ body.dark .ocr-btn-apply { background: var(--green); }
           <tbody id="analysis-body"></tbody>
         </table>
       </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;" id="apply-promedios-note"></div>
       <div class="analysis-charts">
-        <div class="chart-card"><h4>Gasto por insumo</h4><div class="chart-bars" id="chart-gasto"></div></div>
-        <div class="chart-card"><h4>Promedio diario</h4><div class="chart-bars" id="chart-diario"></div></div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h4>Gasto por insumo</h4>
+            <div class="chart-card-total" id="chart-total-gasto">—<span>uds.</span></div>
+          </div>
+          <div class="chart-bars" id="chart-gasto"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h4>Promedio diario</h4>
+            <div class="chart-card-total" id="chart-total-diario">—<span>uds./día</span></div>
+          </div>
+          <div class="chart-bars" id="chart-diario"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1893,6 +1997,7 @@ body.dark .ocr-btn-apply { background: var(--green); }
 
 </main>
 
+<div id="alertas-container" class="alertas-container"></div>
 <div id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -2286,9 +2391,18 @@ function dismissAlert(el) {
   setTimeout(() => el.remove(), 400);
 }
 
+let _alertasYaMostradas = false;
+
 function renderAlertas() {
   const criticos = state.insumos.filter(i => calcularEstado(i) === 'critico');
   const c = document.getElementById('alertas-container');
+
+  // Solo mostrar alertas flotantes en la carga inicial de la página
+  if (_alertasYaMostradas) return;
+  if (!criticos.length) { _alertasYaMostradas = true; return; }
+
+  _alertasYaMostradas = true;
+
   c.innerHTML = criticos.map(ins => `
     <div class="alert-banner">
       <span class="alert-icon">⚠</span>
@@ -2300,7 +2414,8 @@ function renderAlertas() {
     </div>`).join('');
 
   c.querySelectorAll('.alert-banner').forEach((el, i) => {
-    setTimeout(() => dismissAlert(el), 5000 + i * 200);
+    el.style.animationDelay = `${i * 80}ms`;
+    setTimeout(() => dismissAlert(el), 5000 + i * 300);
   });
 }
 
@@ -2525,6 +2640,12 @@ function limpiarConteos() {
 function renderAnaliticaRevision() {
   const analisis = construirAnalisisRevision();
   const meta   = document.getElementById('analysis-meta');
+  // Auto-set date pickers to 07-04-2026 → today if not set
+  const desdeInputEl = document.getElementById('analysis-fecha-desde');
+  const hastaInputEl = document.getElementById('analysis-fecha-hasta');
+  if (desdeInputEl && !desdeInputEl.value) desdeInputEl.value = '2026-04-07';
+  if (hastaInputEl && !hastaInputEl.value) hastaInputEl.value = new Date().toISOString().slice(0,10);
+
   const select = document.getElementById('analysis-base-select');
   const kpis   = document.getElementById('analysis-kpis');
   const body   = document.getElementById('analysis-body');
@@ -2543,8 +2664,9 @@ function renderAnaliticaRevision() {
     return;
   }
 
-  const { snap, dias, comparacion, totalGasto, totalActual, promedioGlobal, conGasto, top } = analisis;
-  meta.textContent = `Comparando cuadre del ${snap.fecha} con conteo actual. Consumo = base + entradas - conteo, en ${dias} día(s). ${conGasto.length} insumo(s) con gasto registrado.`;
+  const { snap, dias, modoLabel, fechaDesde, fechaHasta, comparacion, totalGasto, totalActual, promedioGlobal, conGasto, top } = analisis;
+  const fmtD = d => d.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  meta.textContent = `Período ${modoLabel}: ${fmtD(fechaDesde)} → ${fmtD(fechaHasta)} (${dias} día(s)). Cuadre base: ${snap.fecha}. ${conGasto.length} insumo(s) con gasto.`;
   kpis.innerHTML = `
     <div class="mini-kpi"><div class="mini-kpi-label">Días analizados</div><div class="mini-kpi-value">${dias}</div></div>
     <div class="mini-kpi"><div class="mini-kpi-label">Gasto total</div><div class="mini-kpi-value">${fmtNum(totalGasto)}</div></div>
@@ -2563,6 +2685,25 @@ function renderAnaliticaRevision() {
 
   dibujarGraficoBarras('chart-gasto', top, 'gasto', '#dc2626');
   dibujarGraficoBarras('chart-diario', top, 'promedio', '#00b85a');
+
+  // Auto-sync: update inventory consumo/día to match analysis prom./día
+  const applyNote = document.getElementById('apply-promedios-note');
+  const conProm = analisis.comparacion.filter(i => i.promedio > 0);
+  let synced = 0;
+  conProm.forEach(item => {
+    const ins = state.insumos.find(i => i.sku === item.sku);
+    if (ins && ins.consumo !== item.promedio) {
+      ins.consumo = item.promedio;
+      synced++;
+    }
+  });
+  if (synced > 0) {
+    guardarEstado();
+    renderKPIs(); renderTabla(); renderAlertas();
+    if (applyNote) applyNote.textContent = `✓ Cons./día sincronizado automáticamente (${conProm.length} insumos)`;
+  } else {
+    if (applyNote) applyNote.textContent = conProm.length > 0 ? `✓ Cons./día ya sincronizado (${conProm.length} insumos)` : '';
+  }
 }
 
 function renderCalendario() {
@@ -2636,29 +2777,47 @@ function renderCuadresRealizados() {
 function dibujarGraficoBarras(containerId, datos, key, color) {
   const container = document.getElementById(containerId);
   if (!container) return;
-  if (!datos.length || datos.every(i=>i[key]===0)) {
-    container.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100px;color:var(--text3);font-size:12px;font-style:italic;">Sin variación suficiente.</div>`;
+
+  const isGreen = color === '#00b85a';
+  const totalId = containerId === 'chart-gasto' ? 'chart-total-gasto' : 'chart-total-diario';
+  const totalEl = document.getElementById(totalId);
+
+  const conValor = datos.filter(i => i[key] > 0);
+  if (!conValor.length) {
+    container.innerHTML = `<div style="text-align:center;padding:28px 0;color:var(--text3);font-size:12px;font-style:italic;">Sin variación suficiente.</div>`;
+    if (totalEl) totalEl.childNodes[0].textContent = '—';
     return;
   }
+
+  const total = conValor.reduce((s,i)=>s+i[key],0);
+  if (totalEl) {
+    totalEl.childNodes[0].textContent = fmtNum(parseFloat(total.toFixed(1)));
+  }
+
   const max = Math.max(...datos.map(i=>i[key]), 1);
-  const isGreen = color === '#00b85a';
-  const getColor = v => {
-    const p = v/max;
-    return isGreen ? (p>0.6?'#00b85a':p>0.3?'#33cc7a':'#66d999') : (p>0.6?'#dc2626':p>0.3?'#ef4444':'#f87171');
-  };
-  container.innerHTML = datos.map((item,i) => {
-    const val = item[key];
-    const pct = val>0 ? Math.max(3,(val/max)*100) : 0;
-    const lbl = item.nombre.length>24 ? item.nombre.slice(0,24)+'…' : item.nombre;
-    const bc  = val>0 ? getColor(val) : 'transparent';
-    return `<div class="chart-row" style="animation-delay:${i*60}ms">
-      <div class="chart-label" title="${item.nombre}">${lbl}</div>
+  const palette = isGreen
+    ? ['#00b85a','#00a050','#33cc7a','#66d999','#99e6bb','#b3edcc']
+    : ['#dc2626','#c41f1f','#ef4444','#f87171','#fca5a5','#fed7d7'];
+
+  container.innerHTML = datos.map((item, i) => {
+    const val  = item[key];
+    const pct  = val > 0 ? Math.max(2, (val/max)*100) : 0;
+    const share= total > 0 ? Math.round((val/total)*100) : 0;
+    const lbl  = item.nombre.length > 22 ? item.nombre.slice(0,22)+'…' : item.nombre;
+    const bc   = val > 0 ? palette[Math.min(i, palette.length-1)] : 'transparent';
+    const rank = i + 1;
+    return `<div class="chart-row" style="animation-delay:${i*70}ms">
+      <div class="chart-label" title="${item.nombre}">
+        ${lbl}
+        <span class="chart-rank">#${rank} · ${share}% del total</span>
+      </div>
       <div class="chart-bar-wrap">
         <div class="chart-bar-track">
-          <div class="chart-bar-fill" style="width:${pct}%;background:${bc};animation-delay:${i*60+80}ms;"></div>
+          <div class="chart-bar-fill" style="width:${pct}%;background:${bc};animation-delay:${i*70+100}ms;"></div>
         </div>
-        <span class="chart-val" style="color:${val>0?bc:'var(--text3)'};">${val>0?fmtNum(val):'—'}</span>
+        <div class="chart-bar-pct">${val>0?share+'%':''}</div>
       </div>
+      <span class="chart-val" style="color:${val>0?bc:'var(--text3)'};">${val>0?fmtNum(parseFloat(val.toFixed(1))):'—'}</span>
     </div>`;
   }).join('');
 }
@@ -2693,18 +2852,79 @@ function obtenerConteoActual() {
     return { sku: ins.sku, nombre: ins.nombre, actual: isNaN(v) ? stockActual(ins) : v };
   });
 }
+function limpiarFechasAnalisis() {
+  document.getElementById('analysis-fecha-desde').value = '';
+  document.getElementById('analysis-fecha-hasta').value = '';
+  renderAnaliticaRevision();
+}
+
+function toInputDate(d) {
+  // Convert Date to YYYY-MM-DD for input[type=date]
+  return d.toISOString().slice(0,10);
+}
+function fromInputDate(s) {
+  if (!s) return null;
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
 function construirAnalisisRevision() {
   const snap = obtenerSnapshotBase();
   if (!snap) return null;
-  const fechaBase = fechaDesdeTextoCL(snap.fecha) || new Date(snap.fechaISO||Date.now());
-  const fechaISO  = new Date(snap.fechaISO||fechaBase);
-  const ahora_now = new Date();
-  const dias      = diasEntreFechas(fechaBase, ahora_now);
-  const mapaBase  = new Map(snap.items.map(i=>[i.sku, i.stock]));
 
-  const entsMov = state.historial.filter(m => m.tipo==='entrada').filter(m => {
+  const inputDesde = document.getElementById('analysis-fecha-desde')?.value;
+  const inputHasta = document.getElementById('analysis-fecha-hasta')?.value;
+
+  // Determine date range
+  const snapFechaBase = fechaDesdeTextoCL(snap.fecha) || new Date(snap.fechaISO||Date.now());
+  const snapFechaISO  = new Date(snap.fechaISO || snapFechaBase);
+  const ahora_now     = new Date();
+
+  // If user selected dates manually, use those; else auto
+  const modoManual = inputDesde || inputHasta;
+  let fechaDesde, fechaHasta, modoLabel;
+
+  if (modoManual) {
+    fechaDesde = fromInputDate(inputDesde) || snapFechaBase;
+    fechaHasta = fromInputDate(inputHasta) || ahora_now;
+    modoLabel  = 'Manual';
+    // Set end time to end of day
+    fechaHasta.setHours(23,59,59,999);
+  } else {
+    fechaDesde = snapFechaBase;
+    fechaHasta = ahora_now;
+    modoLabel  = 'Automático';
+    // Pre-fill inputs as hint (readonly style)
+    const desdeEl = document.getElementById('analysis-fecha-desde');
+    const hastaEl = document.getElementById('analysis-fecha-hasta');
+    if (desdeEl && !desdeEl.value) desdeEl.placeholder = toInputDate(fechaDesde);
+    if (hastaEl && !hastaEl.value) hastaEl.placeholder = toInputDate(fechaHasta);
+  }
+
+  const dias = diasEntreFechas(fechaDesde, fechaHasta);
+
+  // Build base map: use snap items (auto) or find closest snapshot to fechaDesde (manual)
+  let mapaBase, snapUsado;
+  if (modoManual && inputDesde) {
+    // Find snapshot closest to fechaDesde
+    const snaps = obtenerSnapshotsOrdenados();
+    const target = fechaDesde.getTime();
+    snapUsado = snaps.reduce((best, s) => {
+      const d = Math.abs(new Date(s.fechaISO||0) - target);
+      const bd = Math.abs(new Date(best?.fechaISO||0) - target);
+      return d < bd ? s : best;
+    }, snaps[0]);
+    mapaBase = new Map((snapUsado?.items||[]).map(i=>[i.sku, i.stock]));
+  } else {
+    snapUsado = snap;
+    mapaBase  = new Map(snap.items.map(i=>[i.sku, i.stock]));
+  }
+
+  // Entradas in range
+  const entsMov = state.historial.filter(m => {
+    if (m.tipo !== 'entrada') return false;
     const f = fechaHoraDesdeTs(m.ts);
-    return f > fechaISO && f <= ahora_now;
+    return f >= fechaDesde && f <= fechaHasta;
   });
   const entsPorSku = new Map();
   entsMov.forEach(m => entsPorSku.set(m.sku, (entsPorSku.get(m.sku)||0) + Number(m.cantidad||0)));
@@ -2713,15 +2933,21 @@ function construirAnalisisRevision() {
     const previo   = mapaBase.get(item.sku) ?? 0;
     const entradas = entsPorSku.get(item.sku) || 0;
     const gasto    = Math.max((previo + entradas) - item.actual, 0);
-    const promedio = gasto > 0 ? Math.max(1, Math.round(gasto/dias)) : 0;
+    const promedio = dias > 0 && gasto > 0 ? parseFloat((gasto/dias).toFixed(1)) : 0;
     return { sku: item.sku, nombre: item.nombre, previo, entradas, actual: item.actual, gasto, promedio };
   });
 
-  const totalGasto    = comparacion.reduce((s,i)=>s+i.gasto, 0);
-  const totalActual   = comparacion.reduce((s,i)=>s+i.actual, 0);
-  const promedioGlobal= totalGasto>0 ? Math.max(1, Math.round(totalGasto/dias)) : 0;
-  const conGasto      = comparacion.filter(i=>i.gasto>0);
-  return { snap, dias, comparacion, totalGasto, totalActual, promedioGlobal, conGasto, top: [...comparacion].sort((a,b)=>b.gasto-a.gasto).slice(0,6) };
+  const totalGasto     = comparacion.reduce((s,i)=>s+i.gasto, 0);
+  const totalActual    = comparacion.reduce((s,i)=>s+i.actual, 0);
+  const promedioGlobal = dias > 0 && totalGasto > 0 ? parseFloat((totalGasto/dias).toFixed(1)) : 0;
+  const conGasto       = comparacion.filter(i=>i.gasto>0);
+
+  return {
+    snap: snapUsado, dias, modoLabel,
+    fechaDesde, fechaHasta,
+    comparacion, totalGasto, totalActual, promedioGlobal, conGasto,
+    top: [...comparacion].sort((a,b)=>b.gasto-a.gasto).slice(0,6)
+  };
 }
 
 // ════════════════════════════════════════════════
@@ -3156,6 +3382,60 @@ function switchMovTab(tipo) {
 }
 
 // ════════════════════════════════════════════════
+// SINCRONIZAR PROMEDIOS ANÁLISIS → INVENTARIO
+// ════════════════════════════════════════════════
+function sincronizarPromediosAlInventario(silencioso = false) {
+  const analisis = construirAnalisisRevision();
+  if (!analisis) return;
+  const conPromedio = analisis.comparacion.filter(i => i.promedio > 0);
+  if (!conPromedio.length) return;
+  let actualizados = 0;
+  conPromedio.forEach(item => {
+    const ins = state.insumos.find(i => i.sku === item.sku);
+    if (ins && ins.consumo !== item.promedio) {
+      ins.consumo = item.promedio;
+      actualizados++;
+    }
+  });
+  if (actualizados > 0) {
+    guardarEstado();
+    renderKPIs(); renderTabla(); renderAlertas();
+    if (!silencioso) toast(`✓ ${actualizados} consumo(s) sincronizados con el análisis`, 'success');
+  }
+}
+
+// ════════════════════════════════════════════════
+// APLICAR PROMEDIOS DEL ANÁLISIS AL INVENTARIO
+// ════════════════════════════════════════════════
+function aplicarPromediosAlInventario() {
+  const analisis = construirAnalisisRevision();
+  if (!analisis) { toast('No hay análisis disponible', 'error'); return; }
+
+  const conPromedio = analisis.comparacion.filter(i => i.promedio > 0);
+  if (!conPromedio.length) { toast('No hay promedios calculados para aplicar', 'error'); return; }
+
+  const lista = conPromedio.map(i => `• ${i.nombre}: ${i.promedio}/día`).join('\n');
+  confirmarModal(
+    '¿Aplicar promedios al inventario?',
+    `Se actualizará el Cons./día de ${conPromedio.length} insumo(s):\n\n${lista}`,
+    () => {
+      conPromedio.forEach(item => {
+        const ins = state.insumos.find(i => i.sku === item.sku);
+        if (ins) {
+          state.historial.push({ ts: ahora(), sku: ins.sku, nombre: ins.nombre, tipo: 'consumo', cantidad: null, stockResult: null, obs: `Consumo actualizado desde análisis: ${ins.consumo} → ${item.promedio}/día (${analisis.dias} días)` });
+          ins.consumo = item.promedio;
+        }
+      });
+      guardarEstado();
+      renderKPIs(); renderTabla(); renderAlertas();
+      document.getElementById('apply-promedios-note').textContent = `✓ ${conPromedio.length} consumo(s) actualizados`;
+      toast(`✓ ${conPromedio.length} consumo(s) aplicados al inventario`, 'success');
+    },
+    '↻', true
+  );
+}
+
+// ════════════════════════════════════════════════
 // RESET CONSUMOS
 // ════════════════════════════════════════════════
 function resetConsumos() {
@@ -3168,6 +3448,58 @@ function resetConsumos() {
   renderTabla();
   renderAlertas();
   toast('Consumos restablecidos a valores originales', 'success');
+}
+
+// ════════════════════════════════════════════════
+// CUADRE HISTÓRICO
+// ════════════════════════════════════════════════
+function abrirCrearCuadreHistorico() {
+  const overlay = document.getElementById('hist-snap-overlay');
+  const container = document.getElementById('hist-snap-items');
+  // Build input for each insumo
+  container.innerHTML = state.insumos.map(ins => `
+    <div style="display:grid;grid-template-columns:1fr 100px;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text);">${ins.nombre}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;">${ins.sku}</div>
+      </div>
+      <input type="number" min="0"
+        id="hist-stock-${ins.sku.replace(/\./g,'_')}"
+        value="${ins.stockInicial}"
+        style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;padding:6px 9px;border:1px solid var(--border2);border-radius:var(--radius-xs);background:var(--surface);color:var(--text);outline:none;text-align:right;width:100%;">
+    </div>`).join('');
+  overlay.classList.add('open');
+}
+
+function guardarCuadreHistorico() {
+  const fechaInput = document.getElementById('hist-snap-fecha').value;
+  if (!fechaInput) { toast('Selecciona una fecha', 'error'); return; }
+  const [y,m,d] = fechaInput.split('-').map(Number);
+  const fechaLabel = `${String(d).padStart(2,'0')}-${String(m).padStart(2,'0')}-${y}`;
+  const fechaISO = new Date(y, m-1, d, 8, 0, 0).toISOString();
+
+  const items = state.insumos.map(ins => {
+    const id = ins.sku.replace(/\./g,'_');
+    const val = parseInt(document.getElementById('hist-stock-'+id)?.value);
+    return { sku: ins.sku, nombre: ins.nombre, stock: isNaN(val) ? ins.stockInicial : val };
+  });
+
+  // Remove existing snap with same date if any
+  state.revisionSnapshots = state.revisionSnapshots.filter(s => s.fecha !== fechaLabel);
+  state.revisionSnapshots.push({ fecha: fechaLabel, fechaISO, origen: 'revision', items });
+  state.snapshotBaseSeleccionado = fechaISO;
+
+  guardarEstado();
+  document.getElementById('hist-snap-overlay').classList.remove('open');
+
+  // Auto-set analysis dates
+  const hoy = new Date().toISOString().slice(0,10);
+  document.getElementById('analysis-fecha-desde').value = fechaInput;
+  document.getElementById('analysis-fecha-hasta').value = hoy;
+
+  renderAnaliticaRevision();
+  renderCuadresRealizados();
+  toast(`Cuadre del ${fechaLabel} guardado — análisis actualizado`, 'success');
 }
 
 // ════════════════════════════════════════════════
@@ -3185,6 +3517,10 @@ function cerrarSheetsModal() {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sheets-modal-overlay')?.addEventListener('click', e => {
     if (e.target === document.getElementById('sheets-modal-overlay')) cerrarSheetsModal();
+  });
+  document.getElementById('hist-snap-overlay')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('hist-snap-overlay'))
+      document.getElementById('hist-snap-overlay').classList.remove('open');
   });
 });
 async function guardarURLSheets() {
@@ -3220,6 +3556,24 @@ if (!localStorage.getItem(KEY.GSHEET)) {
 }
 
 cargarEstado();
+
+// Inject cuadre histórico 07-04-2026 if not already present
+(function() {
+  const FECHA_HIST = '07-04-2026';
+  const ISO_HIST   = '2026-04-07T08:00:00.000Z';
+  const existe = state.revisionSnapshots.some(s => s.fecha === FECHA_HIST);
+  if (!existe) {
+    state.revisionSnapshots.unshift({
+      fecha: FECHA_HIST,
+      fechaISO: ISO_HIST,
+      origen: 'revision',
+      items: [{sku:"OT-CIF-OT", nombre:"Cinta impresa Frágil", stock:30}, {sku:"OT-CINP-OT", nombre:"Cinta impresa Novapet", stock:225}, {sku:"OT-ES100X150-OT", nombre:"Etiquetas semibrillo 150x100", stock:161}, {sku:"OT-ECTR-OT", nombre:"Etiquetas cinta transferencia", stock:100}, {sku:"OT-551-OT", nombre:"Caja 14C 300x240x110", stock:1399}, {sku:"OT-850-OT", nombre:"Caja 14C 310x230x310", stock:1268}, {sku:"OT-570-OT", nombre:"Caja 14C 240x220x110", stock:1250}, {sku:"OT-450-OT", nombre:"Caja 14C 150x150x150", stock:150}, {sku:"OT-TRNS10-OT", nombre:"Rollo film transparente 10 kg", stock:40}, {sku:"OT-TRNS2.5-OT", nombre:"Rollo film transparente 2,5 kg", stock:0}]
+    });
+    state.snapshotBaseSeleccionado = ISO_HIST;
+    guardarEstado();
+  }
+})();
+
 render();
 updateSortIcons();
 
