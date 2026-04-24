@@ -633,7 +633,7 @@ td.num {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 18px 18px;
+  padding: 0 0 16px;
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
@@ -645,7 +645,35 @@ td.num {
   height: 3px;
   background: var(--green);
   border-radius: var(--radius) var(--radius) 0 0;
+  transition: background var(--transition);
 }
+.mov-card.salida-mode::after { background: var(--crit); }
+
+.mov-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.mov-tab {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 11px 20px;
+  border: none;
+  background: none;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all var(--transition);
+}
+.mov-tab:hover { color: var(--text2); }
+.mov-tab.active { color: var(--green); border-bottom-color: var(--green); }
+.mov-tab.active.salida { color: var(--crit); border-bottom-color: var(--crit); }
+
+#panel-entrada, #panel-salida { padding: 0 18px; }
 
 /* Insumo (wide) + Cantidad (narrow) on row 1; Ref + Obs on row 2; button right-aligned */
 .mov-row {
@@ -1650,29 +1678,61 @@ body.dark .ocr-btn-apply { background: var(--green); }
 
     <!-- MOVIMIENTOS -->
     <div class="section-block" id="sec-movimientos" style="min-width:0;overflow:hidden;">
-      <div class="section-header"><span class="section-title">Registrar entrada</span></div>
-      <div class="mov-card entrada-card">
-        <div class="mov-row">
-          <div class="mov-field">
-            <label class="mov-label">Insumo</label>
-            <select class="mov-select" id="ent-sku"></select>
-          </div>
-          <div class="mov-field">
-            <label class="mov-label">Cantidad</label>
-            <input class="mov-input" type="number" id="ent-qty" min="1" placeholder="0">
-          </div>
-          <div class="mov-field">
-            <label class="mov-label">Referencia OC / Factura</label>
-            <input class="mov-input" type="text" id="ent-ref" placeholder="Nº OC, factura, guía...">
-          </div>
-          <div class="mov-field">
-            <label class="mov-label">Observación</label>
-            <input class="mov-input" type="text" id="ent-obs" placeholder="Notas adicionales...">
-          </div>
-          <div class="mov-btn-wrap">
-            <button class="mov-btn entrada" onclick="registrarMovimiento('entrada')">+ Registrar entrada</button>
+      <div class="section-header"><span class="section-title">Registrar movimiento</span></div>
+      <div class="mov-card" id="mov-card-main">
+
+        <!-- Tab switcher -->
+        <div class="mov-tabs">
+          <button class="mov-tab active" id="tab-entrada" onclick="switchMovTab('entrada')">↑ Entrada</button>
+          <button class="mov-tab" id="tab-salida" onclick="switchMovTab('salida')">↓ Salida</button>
+        </div>
+
+        <!-- ENTRADA -->
+        <div id="panel-entrada">
+          <div class="mov-row">
+            <div class="mov-field">
+              <label class="mov-label">Insumo</label>
+              <select class="mov-select" id="ent-sku"></select>
+            </div>
+            <div class="mov-field">
+              <label class="mov-label">Cantidad</label>
+              <input class="mov-input" type="number" id="ent-qty" min="1" placeholder="0">
+            </div>
+            <div class="mov-field">
+              <label class="mov-label">Referencia OC / Factura</label>
+              <input class="mov-input" type="text" id="ent-ref" placeholder="Nº OC, factura, guía...">
+            </div>
+            <div class="mov-field">
+              <label class="mov-label">Observación</label>
+              <input class="mov-input" type="text" id="ent-obs" placeholder="Notas adicionales...">
+            </div>
+            <div class="mov-btn-wrap">
+              <button class="mov-btn entrada" onclick="registrarMovimiento('entrada')">+ Registrar entrada</button>
+            </div>
           </div>
         </div>
+
+        <!-- SALIDA -->
+        <div id="panel-salida" style="display:none;">
+          <div class="mov-row">
+            <div class="mov-field">
+              <label class="mov-label">Insumo</label>
+              <select class="mov-select" id="sal-sku"></select>
+            </div>
+            <div class="mov-field">
+              <label class="mov-label">Cantidad</label>
+              <input class="mov-input" type="number" id="sal-qty" min="1" placeholder="0">
+            </div>
+            <div class="mov-field" style="grid-column:1/-1;">
+              <label class="mov-label">Observación</label>
+              <input class="mov-input" type="text" id="sal-obs" placeholder="Destino, pedido, motivo...">
+            </div>
+            <div class="mov-btn-wrap">
+              <button class="mov-btn salida" onclick="registrarMovimiento('salida')">− Registrar salida</button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- CALENDARIO + CUADRES SIDE BY SIDE -->
@@ -2360,7 +2420,7 @@ function guardarPuntoReposInline(sku, input, prev) {
 
 function renderSelectores() {
   const ops = state.insumos.map(i => `<option value="${i.sku}">${i.nombre}</option>`).join('');
-  ['ent-sku'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=ops; });
+  ['ent-sku','sal-sku'].forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=ops; });
 }
 
 function renderHistorial() {
@@ -2675,7 +2735,7 @@ function registrarMovimiento(tipo) {
   const sku = document.getElementById(tipo==='entrada'?'ent-sku':'sal-sku').value;
   const qty = parseInt(document.getElementById(tipo==='entrada'?'ent-qty':'sal-qty').value);
   const ref = tipo==='entrada' ? document.getElementById('ent-ref').value.trim() : '';
-  const obs = document.getElementById(tipo==='entrada'?'ent-obs':'sal-obs').value.trim();
+  const obs = document.getElementById(tipo==='entrada' ? 'ent-obs' : 'sal-obs')?.value.trim() || '';
 
   if (!qty || qty <= 0) { toast('Ingresa una cantidad válida', 'error'); return; }
   const ins = state.insumos.find(i=>i.sku===sku);
@@ -3065,6 +3125,31 @@ function ocr_aplicarTodos() {
   document.getElementById('ocr-apply-note').textContent = `${ok} aplicado(s)${skip?`, ${skip} sin coincidencia`:''}`;
   toast(`${ok} ítem(s) aplicados al conteo`, 'success');
   document.getElementById('sec-revision')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ════════════════════════════════════════════════
+// MOV TABS
+// ════════════════════════════════════════════════
+function switchMovTab(tipo) {
+  const card = document.getElementById('mov-card-main');
+  const tabEnt = document.getElementById('tab-entrada');
+  const tabSal = document.getElementById('tab-salida');
+  const panelEnt = document.getElementById('panel-entrada');
+  const panelSal = document.getElementById('panel-salida');
+
+  if (tipo === 'entrada') {
+    tabEnt.classList.add('active'); tabEnt.classList.remove('salida');
+    tabSal.classList.remove('active');
+    panelEnt.style.display = 'block';
+    panelSal.style.display = 'none';
+    card.classList.remove('salida-mode');
+  } else {
+    tabSal.classList.add('active', 'salida');
+    tabEnt.classList.remove('active');
+    panelEnt.style.display = 'none';
+    panelSal.style.display = 'block';
+    card.classList.add('salida-mode');
+  }
 }
 
 // ════════════════════════════════════════════════
