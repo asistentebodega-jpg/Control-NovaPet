@@ -154,6 +154,14 @@ header h1 span { color: rgba(255,255,255,.35); font-weight: 300; }
   text-transform: capitalize;
 }
 
+#ultimo-guardado {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: rgba(0,184,90,.5);
+  letter-spacing: .03em;
+  margin-right: 4px;
+}
+
 .btn-hdr {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
@@ -1691,7 +1699,9 @@ body.dark .ocr-btn-apply { background: var(--green); }
   </div>
   <div class="header-right">
     <span id="fecha-actual"></span>
+    <span id="ultimo-guardado"></span>
     <span id="sync-indicator" style="font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.04em;cursor:pointer;" onclick="abrirConfigSheets()" title="Configurar Google Sheets">○ Local</span>
+    <button class="btn-hdr primary" id="btn-guardar-manual" onclick="guardarManual()" title="Guardar ahora en Google Sheets">💾 Guardar</button>
     <div class="header-pipe"></div>
     <button class="btn-hdr primary" onclick="abrirImportacion()">↑ Excel</button>
     <button class="btn-hdr" onclick="exportarCSV()">↓ Excel</button>
@@ -2014,10 +2024,12 @@ const KEY = {
   REVS:      'cdnp_revisiones',
   DARK:      'cdnp_dark',
   GSHEET:    'cdnp_gsheet_url',
+  LAST_SYNC: 'cdnp_last_sync',
 };
 
 // ── GOOGLE SHEETS SYNC ──
 let _syncTimer = null;
+let _autoSaveInterval = null;
 
 function getSheetURL() {
   return localStorage.getItem(KEY.GSHEET) || '';
@@ -2027,6 +2039,7 @@ async function sincronizarConSheet(silencioso = false) {
   const url = getSheetURL();
   if (!url) return;
   try {
+    actualizarIndicadorSync('loading');
     const payload = JSON.stringify({
       insumos:           state.insumos,
       historial:         state.historial,
@@ -2041,15 +2054,52 @@ async function sincronizarConSheet(silencioso = false) {
     });
     const txt = await res.text();
     if (txt === 'ok') {
+      const tsAhora = new Date().toLocaleString('es-CL', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      localStorage.setItem(KEY.LAST_SYNC, tsAhora);
       actualizarIndicadorSync('ok');
+      actualizarUltimoGuardado(tsAhora);
       if (!silencioso) toast('✓ Guardado en Google Sheets', 'success');
     } else {
       actualizarIndicadorSync('error');
+      if (!silencioso) toast('✗ Sheets respondió con error', 'error');
     }
   } catch(e) {
     actualizarIndicadorSync('error');
     if (!silencioso) toast('✗ Error al sincronizar con Sheets', 'error');
   }
+}
+
+function actualizarUltimoGuardado(ts) {
+  const el = document.getElementById('ultimo-guardado');
+  if (el) el.textContent = ts ? `Último guardado: ${ts}` : '';
+}
+
+function iniciarAutosave() {
+  if (_autoSaveInterval) clearInterval(_autoSaveInterval);
+  _autoSaveInterval = setInterval(async () => {
+    if (getSheetURL()) {
+      await sincronizarConSheet(true);
+    }
+  }, 3 * 60 * 1000);
+}
+
+async function guardarManual() {
+  if (!getSheetURL()) {
+    toast("No hay conexión a Google Sheets configurada", "error");
+    return;
+  }
+  const btn = document.getElementById("btn-guardar-manual");
+  const textoOriginal = btn.textContent;
+  btn.textContent = "⏳ Guardando…";
+  btn.disabled = true;
+  guardarEstado();
+  clearTimeout(_syncTimer);
+  await sincronizarConSheet(false);
+  btn.textContent = "✓ Guardado";
+  setTimeout(() => {
+    btn.textContent = textoOriginal;
+    btn.disabled = false;
+  }, 2500);
 }
 
 async function cargarDesdeSheet() {
@@ -3499,7 +3549,15 @@ function guardarCuadreHistorico() {
 
   renderAnaliticaRevision();
   renderCuadresRealizados();
-  toast(`Cuadre del ${fechaLabel} guardado — análisis actualizado`, 'success');
+  toast(`Cuadre del ${fechaLabel} guardado — sincronizando…`, 'success');
+
+  // Forzar sincronización inmediata con Sheets (no esperar el timer)
+  if (getSheetURL()) {
+    clearTimeout(_syncTimer);
+    sincronizarConSheet(false).then(()=>{
+      toast(`✓ Cuadre del ${fechaLabel} respaldado en Sheets`, 'success');
+    });
+  }
 }
 
 // ════════════════════════════════════════════════
@@ -3556,6 +3614,12 @@ if (!localStorage.getItem(KEY.GSHEET)) {
 }
 
 cargarEstado();
+
+// Mostrar último guardado conocido
+actualizarUltimoGuardado(localStorage.getItem(KEY.LAST_SYNC) || '');
+
+// Iniciar autosave cada 3 minutos
+iniciarAutosave();
 
 // Inject cuadre histórico 07-04-2026 if not already present
 (function() {
