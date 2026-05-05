@@ -3609,8 +3609,8 @@ function desconectarSheets() {
 // INIT
 // ════════════════════════════════════════════════
 // Pre-set Google Sheets URL
-if (!localStorage.getItem(KEY.GSHEET)) {
-  localStorage.setItem(KEY.GSHEET, 'https://script.google.com/macros/s/AKfycbxRNE39Xal2fxvswVBDo1ak7u-GtMHgFxeq45AkrsRs4xiFIPSjRRshBOMfMCV1GHTv/exec');
+if (!localStorage.getItem(KEY.GSHEET) || localStorage.getItem(KEY.GSHEET) === 'https://script.google.com/macros/s/AKfycbyT3iQLYxkDpK5k10EJfgm1Mfvbo2DIVd7XnLgTYmLvbeTNHkrLmMzYF5ISSAFXYDyp9A/exec') {
+  localStorage.setItem(KEY.GSHEET, 'https://script.google.com/macros/s/AKfycbyT3iQLYxkDpK5k10EJfgm1Mfvbo2DIVd7XnLgTYmLvbeTNHkrLmMzYF5ISSAFXYDyp9A/exec');
 }
 
 cargarEstado();
